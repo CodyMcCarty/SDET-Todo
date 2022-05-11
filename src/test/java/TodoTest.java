@@ -16,6 +16,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class TodoTest {
+
   WebDriver chromeDriver;
 
   @BeforeClass
@@ -37,9 +38,8 @@ public class TodoTest {
 WHEN I add text then press enter
 THEN It is added to the list */
 
-  @Test
-  public void addTodoUpdatesTodoListV1Test()  //TODO: get code review
-  {
+  @Test //TODO: get code review
+  public void addTodoUpdatesTodoListV1Test() {
     chromeDriver.get("http://localhost:3000/");
     WebDriverWait wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(10));
     WebElement todoInput = wait.until(
@@ -51,24 +51,23 @@ THEN It is added to the list */
     todoInput.sendKeys(todoExpected);
     todoInput.sendKeys(Keys.RETURN);
 
-    wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath("//*[@id=\"todo-list\"]/li")));
+    wait.until(
+        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath("//*[@id=\"todo-list\"]/li")));
     List<WebElement> todos = chromeDriver.findElements(By.xpath("//*[@id=\"todo-list\"]/li"));
     WebElement todoActual;
     try {
       todoActual = todos
-        .stream()
-        .filter(e -> e.getText().contains(todoExpected))
-        .findFirst().get();
-    }
-    catch(Exception e) {
+          .stream()
+          .filter(e -> e.getText().contains(todoExpected))
+          .findFirst().get();
+    } catch (Exception e) {
       todoActual = todos.get(todos.size() - 1);
     }
     Assert.assertEquals(todoExpected, todoActual.getText());
   }
 
   @Test
-  public void addTodoUpdatesTodoListV2Test ()
-  {
+  public void addTodoUpdatesTodoListV2Test() {
     assert true;
   }
 
