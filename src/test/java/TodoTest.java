@@ -18,6 +18,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class TodoTest {
 
   WebDriver chromeDriver;
+  WebDriverWait wait;
 
   @BeforeClass
   public static void setupClass() {
@@ -27,6 +28,8 @@ public class TodoTest {
   @Before
   public void setUp() {
     chromeDriver = new ChromeDriver();
+    chromeDriver.get("http://localhost:3000/"); // FIXME move to setup
+    wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(10));
   }
 
   @After
@@ -40,8 +43,7 @@ THEN It is added to the list */
 
   @Test //TODO: get code review
   public void addTodoUpdatesTodoListV1Test() {
-    chromeDriver.get("http://localhost:3000/"); // FIXME move to setup
-    WebDriverWait wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(10));
+
     WebElement todoInput = wait.until( // this is impciet
         ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
     );
