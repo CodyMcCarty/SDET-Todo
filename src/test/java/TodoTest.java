@@ -1,7 +1,7 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,9 +9,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -19,6 +21,7 @@ public class TodoTest {
 
   WebDriver chromeDriver;
   WebDriverWait wait;
+  Actions action;
 
   @BeforeClass
   public static void setupClass() {
@@ -30,6 +33,7 @@ public class TodoTest {
     chromeDriver = new ChromeDriver();
     chromeDriver.get("http://localhost:3000/"); // FIXME move to setup
     wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(10));
+    action = new Actions(chromeDriver);
   }
 
   @After
@@ -40,48 +44,70 @@ public class TodoTest {
   /* 1) GIVEN I am at the todoPage
 WHEN I add text then press enter
 THEN It is added to the list */
+  @Test
+  public void addTodoUpdatesTodoListTest() {
 
-  @Test //TODO: get code review
-  public void addTodoUpdatesTodoListV1Test() {
-
-    WebElement todoInput = wait.until( // this is impciet
+    WebElement todoInput = wait.until(
         ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
     );
-    String todoExpected = new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
+    String todoExpected =
+        "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
 
     todoInput.clear();
     todoInput.sendKeys(todoExpected);
     todoInput.sendKeys(Keys.RETURN);
 
     wait.until(
-        // FIXME change from xpath to cssSelector
-        ExpectedConditions.visibilityOfAllElementsLocatedBy(By. xpath("//*[@id=\"todo-list\"]/li")));
-    List<WebElement> todos = chromeDriver.findElements(By.xpath("//*[@id=\"todo-list\"]/li"));
-    WebElement todoActual;
-    try {
-      todoActual = todos
-          .stream()
-          .filter(e -> e.getText().contains(todoExpected))
-          .findFirst().get();
-      // FIXME throw exception message about not finding the todoAdded / change to .assert
-    } catch (Exception e) {
-      todoActual = todos.get(todos.size() - 1);
-    }
-    Assert.assertEquals(todoExpected, todoActual.getText());
+        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
+    );
+    String todoActual = chromeDriver.findElements(By.cssSelector("#todo-list > li"))
+        .stream()
+        .filter(e -> e.getText().contains(todoExpected))
+        .findFirst()
+        .orElseThrow(
+            () -> new NoSuchElementException("Expected TODO: " + todoExpected + " Was not found"))
+        .getText();
+
+    Assert.assertEquals(todoExpected, todoActual);
   }
 
+  /*2) GIVEN I am at the todoPage
+    AND there is an item on the list
+    WHEN I hover over the item
+    AND X out on the item
+    THEN the item is removed */
   @Test
-  public void addTodoUpdatesTodoListV2Test() {
-    assert true;
+  public void removeTodoUpdatesListTest() {
+    wait.until(
+        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
+    );
+    WebElement todo = null;
+    try {
+      todo = chromeDriver.findElements(By.cssSelector("#todo-list > li"))
+          .stream().findFirst().get();
+    } catch(TimeoutException e) {
+      throw new TimeoutException("There are no todos.  Please add a todo to test removing a todo");
+    }
+
+    String debugTodo = todo.getText();
+
+    action.moveToElement(todo).moveToElement(chromeDriver.findElement(By.cssSelector("#todo-list > li:nth-child(1) > div > button"))).click().build().perform();
+
+//    String sValue = chromeDriver.findElement(By.cssSelector("q
+//    #todo-list > li:nth-child(1)")).getText();
+    String sValue = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#todo-list > li:nth-child(1)"))).getText();
+
+//    Assert.assertFalse(
+////        chromeDriver.findElements
+//        wait.until(ExpectedConditions.presenceOfElementLocated
+//                (By.cssSelector("#todo-list > li")).andThen(ExpectedConditions.alertIsPresent())
+//            .stream().findFirst()
+//            .get()
+//            .getText()
+//            .contains(todo.getText())
+//    );
+        Assert.assertEquals(todo.getText(), sValue);
   }
-
-
-
-/*2) GIVEN I am at the todoPage
-  AND there is an item on the list
-  WHEN I hover over the item
-  AND X out on the item
-  THEN the item is removed */
 
 /*3) GIVEN I am at the todoPage
   WHEN I click on the circle next to the item
