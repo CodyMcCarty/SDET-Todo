@@ -43,6 +43,9 @@ public class TodoTest {
     chromeDriver.quit();
   }
 
+  // TODO: del all tod in afterclass
+  // TODO: dry the add a todo function
+
   @AfterClass
   public void tearDownClass() {
     wait.until(
