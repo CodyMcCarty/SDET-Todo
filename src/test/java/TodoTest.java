@@ -90,48 +90,22 @@ THEN It is added to the list */
       throw new TimeoutException("There are no todos.  Please add a todo to test removing a todo");
     }
 
+    // add tod if empty
+
     String debugTodo = todo.getText();
 
     action.moveToElement(todo).moveToElement(chromeDriver.findElement(By.cssSelector("#todo-list > li:nth-child(1) > div > button"))).click().build().perform();
 
-//    String sValue = chromeDriver.findElement(By.cssSelector("q
-//    #todo-list > li:nth-child(1)")).getText();
-//    String sValue = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#todo-list > li:nth-child(1)"))).getText(); // is working but throws stale element reference
-
-//    wait.until(
-//        ExpectedConditions.presenceOfElementLocated(By.cssSelector("#todo-list > li:nth-child(1)"))
-//    );
-//    wait.ignoring(StaleElementReferenceException.class).until(ExpectedConditions.(By.cssSelector("#todo-list > li:nth-child(1)")));
-//    String sValue = chromeDriver.findElement(By.cssSelector("#todo-list > li:nth-child(1)")).getText();
-//    WebElement newTodoList = wait.until(
-//        ExpectedConditions.presenceOfElementLocated(By.cssSelector("#todo-list > li:nth-child(1)"))
-//    );
-//    wait.until(
-//        ExpectedConditions.refreshed(ExpectedConditions.stalenessOf(newTodoList))
-//    );
     chromeDriver.navigate().refresh();
     wait.until(
         ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
     );
-//    String sValue = wait.ignoring(StaleElementReferenceException.class).until((chromeDriver) -> chromeDriver.findElement(By.cssSelector("#todo-list > li:nth-child(1)")).getText());
     List<WebElement> sValue = wait.until(
         (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
     );
 
     String debugValue = sValue.get(0).getText();
 
-
-
-//    Assert.assertFalse(
-////        chromeDriver.findElements
-//        wait.until(ExpectedConditions.presenceOfElementLocated
-//                (By.cssSelector("#todo-list > li")).andThen(ExpectedConditions.alertIsPresent())
-//            .stream().findFirst()
-//            .get()
-//            .getText()
-//            .contains(todo.getText())
-//    );
-//        Assert.assertEquals(todo.getText(), sValue);
         Assert.assertNotEquals(debugTodo, debugValue);
   }
 
