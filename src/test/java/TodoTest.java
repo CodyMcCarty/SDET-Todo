@@ -19,6 +19,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+//@RunWith(SpringJUnit4ClassRunner.class)
 public class TodoTest {
 
   WebDriver chromeDriver;
@@ -31,15 +32,35 @@ public class TodoTest {
   }
 
   @Before
-  public void setUp() {
+  public void onSetUp() {
     chromeDriver = new ChromeDriver();
     chromeDriver.get("http://localhost:3000/"); // FIXME move to setup
     wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(5));
     action = new Actions(chromeDriver);
+
+    // if not enough todos then add some
+    int numOfDesiredTodos = 5;
+    wait.until(
+        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
+    );
+    List<WebElement> todos = chromeDriver.findElements(By.cssSelector("#todo-list > li"));
+
+    for (int i=0; i<(numOfDesiredTodos - todos.size()); i++) {
+      WebElement todoInput = wait.until(
+          ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
+      );
+      String todoExpected =
+          "DemoTodo." + new SimpleDateFormat("ss.SSSZ").format(new java.util.Date());
+
+      todoInput.clear();
+      todoInput.sendKeys(todoExpected);
+      todoInput.sendKeys(Keys.RETURN);
+      chromeDriver.navigate().refresh();
+    }
   }
 
   @After
-  public void tearDown() {
+  public void onTearDown() {
     chromeDriver.quit();
   }
 
@@ -111,25 +132,25 @@ THEN It is added to the list */
   public void removeTodoUpdatesListTest() {
 
     // try catch: if no todos to delete then add one
-    try {
-      wait.until(
-          ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
-      );
-      List<WebElement> todos = wait.until(
-          (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
-      );
-    } catch(Exception e) {
-      WebElement todoInput = wait.until(
-          ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
-      );
-      String todoExpected =
-          "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
-
-      todoInput.clear();
-      todoInput.sendKeys(todoExpected);
-      todoInput.sendKeys(Keys.RETURN);
-      chromeDriver.navigate().refresh();
-    }
+//    try {
+//      wait.until(
+//          ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
+//      );
+//      List<WebElement> todos = wait.until(
+//          (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
+//      );
+//    } catch(Exception e) {
+//      WebElement todoInput = wait.until(
+//          ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
+//      );
+//      String todoExpected =
+//          "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
+//
+//      todoInput.clear();
+//      todoInput.sendKeys(todoExpected);
+//      todoInput.sendKeys(Keys.RETURN);
+//      chromeDriver.navigate().refresh();
+//    }
 
     // arrange
     wait.until(
@@ -165,25 +186,25 @@ THEN It is added to the list */
 @Test
 public void checkingTodoMarksItTest() {
   // try catch: if no todos to mark then add one
-  try {
-    wait.until(
-        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
-    );
-    List<WebElement> todos = wait.until(
-        (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
-    );
-  } catch(Exception e) {
-    WebElement todoInput = wait.until(
-        ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
-    );
-    String todoExpected =
-        "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
-
-    todoInput.clear();
-    todoInput.sendKeys(todoExpected);
-    todoInput.sendKeys(Keys.RETURN);
-    chromeDriver.navigate().refresh();
-  }
+//  try {
+//    wait.until(
+//        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
+//    );
+//    List<WebElement> todos = wait.until(
+//        (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
+//    );
+//  } catch(Exception e) {
+//    WebElement todoInput = wait.until(
+//        ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
+//    );
+//    String todoExpected =
+//        "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
+//
+//    todoInput.clear();
+//    todoInput.sendKeys(todoExpected);
+//    todoInput.sendKeys(Keys.RETURN);
+//    chromeDriver.navigate().refresh();
+//  }
 
   // arrange
   wait.until(
@@ -220,50 +241,50 @@ public void checkingTodoMarksItTest() {
 @Test
 public void delTodoDoesNotReorderListTest() {
   // try catch: if no todos to mark then add one
-  try {
-    wait.until(
-        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
-    );
-    List<WebElement> todos = wait.until(
-        (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
-    );
-  } catch(Exception e) {
-    WebElement todoInput = wait.until(
-        ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
-    );
-    String todoExpected =
-        "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
-
-    todoInput.clear();
-    todoInput.sendKeys(todoExpected);
-    todoInput.sendKeys(Keys.RETURN);
-    chromeDriver.navigate().refresh();
-  }
+//  try {
+//    wait.until(
+//        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
+//    );
+//    List<WebElement> todos = wait.until(
+//        (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
+//    );
+//  } catch(Exception e) {
+//    WebElement todoInput = wait.until(
+//        ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
+//    );
+//    String todoExpected =
+//        "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
+//
+//    todoInput.clear();
+//    todoInput.sendKeys(todoExpected);
+//    todoInput.sendKeys(Keys.RETURN);
+//    chromeDriver.navigate().refresh();
+//  }
 
   // if less than 5 todos, add more
-  wait.until(
-      ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
-  );
-  List<WebElement> todos = chromeDriver.findElements(By.cssSelector("#todo-list > li"));
-
-  for (int i=0; i<(5 - todos.size()); i++) {
-    WebElement todoInput = wait.until(
-        ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
-    );
-    String todoExpected =
-        "DemoTodo." + new SimpleDateFormat("ss.SSSZ").format(new java.util.Date());
-
-    todoInput.clear();
-    todoInput.sendKeys(todoExpected);
-    todoInput.sendKeys(Keys.RETURN);
-    chromeDriver.navigate().refresh();
-  }
+//  wait.until(
+//      ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
+//  );
+//  List<WebElement> todos = chromeDriver.findElements(By.cssSelector("#todo-list > li"));
+//
+//  for (int i=0; i<(5 - todos.size()); i++) {
+//    WebElement todoInput = wait.until(
+//        ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
+//    );
+//    String todoExpected =
+//        "DemoTodo." + new SimpleDateFormat("ss.SSSZ").format(new java.util.Date());
+//
+//    todoInput.clear();
+//    todoInput.sendKeys(todoExpected);
+//    todoInput.sendKeys(Keys.RETURN);
+//    chromeDriver.navigate().refresh();
+//  }
   wait.until(
       ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
   );
 
   // arrange
-  todos = chromeDriver.findElements(By.cssSelector("#todo-list > li"));
+  List<WebElement> todos = chromeDriver.findElements(By.cssSelector("#todo-list > li"));
   List<String> todosExpected = new ArrayList<>();
   for (int i=0; i<todos.size(); i++) {
     todosExpected.add(todos.get(i).getText());
