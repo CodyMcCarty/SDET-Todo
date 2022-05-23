@@ -1,3 +1,4 @@
+import ch.qos.logback.classic.Logger;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -24,6 +25,7 @@ public class TodoTest {
   WebDriver chromeDriver;
   WebDriverWait wait;
   Actions action;
+  Logger log;
 
   @BeforeClass
   public static void setupClass() {
@@ -33,11 +35,12 @@ public class TodoTest {
   @Before
   public void onSetUp() {
     chromeDriver = new ChromeDriver();
-    chromeDriver.get("http://localhost:3000/"); // FIXME move to setup
+    chromeDriver.get("http://localhost:3000/");
     wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(5));
     action = new Actions(chromeDriver);
 
     // if not enough todos then add some
+    log.info("adf");
     int numOfDesiredTodos = 5;
     List<WebElement> todos = chromeDriver.findElements(By.cssSelector("#todo-list > li"));
 
@@ -59,13 +62,6 @@ public class TodoTest {
   public void onTearDown() {
     chromeDriver.quit();
   }
-
-  /* TODO: List
-  [x] del all tod in afterClass
-  [x] dry the add a tod function
-  [] any other dry
-  [] slf4j
-   */
 
   @AfterClass
   public static void tearDownClass() {
