@@ -10,7 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -33,7 +32,7 @@ public class TodoTest {
   public void setUp() {
     chromeDriver = new ChromeDriver();
     chromeDriver.get("http://localhost:3000/"); // FIXME move to setup
-    wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(10));
+    wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(5));
     action = new Actions(chromeDriver);
   }
 
@@ -79,34 +78,53 @@ THEN It is added to the list */
     THEN the item is removed */
   @Test
   public void removeTodoUpdatesListTest() {
+
+    // try catch: if no todos to delete then add one
+    try {
+      wait.until(
+          ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
+      );
+      List<WebElement> todos = wait.until(
+          (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
+      );
+    } catch(Exception e) {
+      WebElement todoInput = wait.until(
+          ExpectedConditions.presenceOfElementLocated(By.id("add-todo"))
+      );
+      String todoExpected =
+          "DemoTodo." + new SimpleDateFormat("HH.mm.ss").format(new java.util.Date());
+
+      todoInput.clear();
+      todoInput.sendKeys(todoExpected);
+      todoInput.sendKeys(Keys.RETURN);
+      chromeDriver.navigate().refresh();
+    }
+
+    // arrange
     wait.until(
         ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
     );
-    WebElement todo = null;
-    try {
-      todo = chromeDriver.findElements(By.cssSelector("#todo-list > li"))
-          .stream().findFirst().get();
-    } catch(TimeoutException e) {
-      throw new TimeoutException("There are no todos.  Please add a todo to test removing a todo");
-    }
+    WebElement todo = chromeDriver.findElements(By.cssSelector("#todo-list > li"))
+        .stream().findFirst().get();
+    String unexpected = todo.getText();
 
-    // add tod if empty
-
-    String debugTodo = todo.getText();
-
+    // act
     action.moveToElement(todo).moveToElement(chromeDriver.findElement(By.cssSelector("#todo-list > li:nth-child(1) > div > button"))).click().build().perform();
 
-    chromeDriver.navigate().refresh();
-    wait.until(
-        ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
-    );
-    List<WebElement> sValue = wait.until(
-        (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
-    );
-
-    String debugValue = sValue.get(0).getText();
-
-        Assert.assertNotEquals(debugTodo, debugValue);
+    // assert
+    List<WebElement> todosUpdated = null;
+    try {
+      wait.until(
+          ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list"))
+      );
+      todosUpdated = wait.until(
+          (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list"))
+      );
+    } catch (Exception e) {
+      todosUpdated = chromeDriver.findElements(By.cssSelector("#todo-list"));
+    }
+    String actual = todosUpdated.get(0).getText();
+    Assert.assertNotEquals(unexpected, actual);
   }
 
 /*3) GIVEN I am at the todoPage
