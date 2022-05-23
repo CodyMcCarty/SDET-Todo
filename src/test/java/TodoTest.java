@@ -43,26 +43,33 @@ public class TodoTest {
     chromeDriver.quit();
   }
 
-  // TODO: del all tod in afterclass
-  // TODO: dry the add a todo function
+  // TODO: [x] del all tod in afterclass
+  // TODO: [] dry the add a todo function
 
   @AfterClass
-  public void tearDownClass() {
+  public static void tearDownClass() {
+    WebDriver chromeDriver = new ChromeDriver();
+    chromeDriver.get("http://localhost:3000/");
+    WebDriverWait wait = new WebDriverWait(chromeDriver, Duration.ofSeconds(5));
+    Actions action = new Actions(chromeDriver);
+
     wait.until(
         ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
     );
     List<WebElement> todos = wait.until(
-        (chromeDriver) -> chromeDriver.findElements(By.cssSelector("#todo-list > li"))
+        (driver) -> chromeDriver.findElements(By.cssSelector("#todo-list > li"))
     );
 
     for (int i=0; i<todos.size(); i++) {
+      chromeDriver.navigate().refresh();
       wait.until(
           ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("#todo-list > li"))
       );
-//      WebElement todo = chromeDriver.findElements(By.cssSelector("#todo-list > li"))
-//          .stream().findFirst().get();
-//      action.moveToElement(todo).moveToElement(chromeDriver.findElement(By.cssSelector("#todo-list > li:nth-child(1) > div > button"))).click().build().perform();
+      WebElement todo = chromeDriver.findElements(By.cssSelector("#todo-list > li"))
+          .stream().findFirst().get();
+      action.moveToElement(todo).moveToElement(chromeDriver.findElement(By.cssSelector("#todo-list > li:nth-child(1) > div > button"))).click().build().perform();
     }
+    chromeDriver.quit();
   }
 
   /* 1) GIVEN I am at the todoPage
